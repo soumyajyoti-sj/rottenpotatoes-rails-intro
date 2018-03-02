@@ -15,12 +15,21 @@ class MoviesController < ApplicationController
   # end
   
   def index
-    sort = params[:sort]
+    sort = params[:sort] || session[:sort]
     @all_ratings = Movie.all_ratings
-    ticked_ratings = params[:ratings]
+    ticked_ratings = params[:ratings] || session[:ratings]
+    
+    if params[:sort] != session[:sort] or params[:ratings] != session[:ratings]
+      session[:sort] = sort
+      session[:ratings] = ticked_ratings
+      redirect_to :sort => sort, :ratings => ticked_ratings and return
+    end    
+    
+    flash.keep
     @ratings = ticked_ratings.nil? ? Movie.all_ratings : ticked_ratings.keys
-    @movies = Movie.order(sort).where(rating: @ratings).all
-  end  
+    @movies = Movie.order(sort).where(:rating => @ratings).all
+    
+  end 
 
   def new
     # default: render 'new' template
