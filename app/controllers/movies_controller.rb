@@ -16,8 +16,11 @@ class MoviesController < ApplicationController
   
   def index
     sort = params[:sort]
-    @movies = Movie.order(sort).all
-  end   
+    @all_ratings = Movie.all_ratings
+    ticked_ratings = params[:ratings]
+    @ratings = ticked_ratings.nil? ? Movie.all_ratings : ticked_ratings.keys
+    @movies = Movie.order(sort).where(rating: @ratings).all
+  end  
 
   def new
     # default: render 'new' template
